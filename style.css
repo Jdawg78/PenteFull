@@ -1,0 +1,31 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+canvas {
+  display: block;
+  margin: 20px auto;
+  background: #e9a838; /* Slight tan color for board */
+  border: 10px solid #614400;
+}
+#status {
+  color: white;
+  background-image: linear-gradient(to top, rgb(96, 72, 1), rgb(31, 25, 0));
+  font-family: 'medievalsharp','cursive';
+  font-size: 18px;
+  margin-top: 10px;
+  text-shadow: 4px 4px 8px rgb(1,1,52);
+}
+h1 {
+  
+  font-size: 70px;
+  color: white;
+  background-image: linear-gradient(to top, rgb(223, 168, 0), rgb(31, 25, 0));
+  font-family: 'medievalsharp', 'Arial Narrow Bold', sans-serif;
+  text-shadow: 4px 4px 8px rgb(1, 1, 52);
+}
+.medievalsharp-regular {
+  font-family: 'MedievalSharp', cursive;
+  font-weight: 400;
+  font-style: normal;
+}
