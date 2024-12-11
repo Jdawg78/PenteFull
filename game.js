@@ -256,116 +256,134 @@ function updateStatus(won = false) {
   statusDiv.textContent = msg;
 }
 function getWinningStones(row, col, dr, dc, count) {
-  let winningStones = [];
-  for (let i = 0; i < count; i++) {
-    winningStones.push({ r: row + i * dr, c: col + i * dc });
-  }
-  return winningStones;
+    const winningStones = [];
+    const stoneSet = new Set();
+
+    for (let i = 0; i < count; i++) {
+        const r = row + i * dr;
+        const c = col + i * dc;
+        const key = `${r},${c}`;
+
+        console.log("Stone Key:", key); // Output the key
+        console.log("Stone Set:", stoneSet); // Output the set
+
+        if (!stoneSet.has(key)) {
+            stoneSet.add(key);
+            winningStones.push({ r, c });
+        }
+    }
+
+    console.log("Winning stones calculated:", winningStones);
+    return winningStones;
 }
 
 function checkWin(row, col) {
-  // Check for capture-based win
-  if (blackCaptures >= 5 || whiteCaptures >= 5) {
-    return true;  
-  }
+    // Check for 5 in a row (including capture-based win check)
+    const directions = [
+        { dr: 1, dc: 0 },
+        { dr: 0, dc: 1 },
+        { dr: 1, dc: 1 },
+        { dr: 1, dc: -1 }
+    ];
 
-  // Check for 5 in a row
-  const directions = [
-    { dr: 1, dc: 0 },
-    { dr: 0, dc: 1 },
-    { dr: 1, dc: 1 },
-    { dr: 1, dc: -1 }
-  ];
-
-  for (let d of directions) {
-    let count = countInDirection(row, col, d.dr, d.dc); 
-    if (count >= 5) {
-      const winningStones = getWinningStones(row, col, d.dr, d.dc, count);
-      highlightStones(winningStones); 
-      return true; 
+    for (let d of directions) {
+        let count = countInDirection(row, col, d.dr, d.dc);
+        if (count >= 5) {
+            const winningStones = getWinningStones(row, col, d.dr, d.dc, count);
+            highlightStones(winningStones);
+            return true;
+        }
     }
-  }
 
-  return false; 
+    // Check for capture-based win if no 5-in-a-row win is found
+    if (blackCaptures >= 5 || whiteCaptures >= 5) {
+        return true;
+    }
+
+    return false;
 }
 
 function highlightStones(stones) {
-  for (let stone of stones) {
-    const x = stone.c * CELL_SIZE + CELL_SIZE / 2;
-    const y = stone.r * CELL_SIZE + CELL_SIZE / 2;
-    const radius = CELL_SIZE * 0.4;
+    const highlighted = new Set(); // Keep track of highlighted stones
 
-    ctx.beginPath();
-    ctx.arc(x, y, radius + 3, 0, 2 * Math.PI); 
-    ctx.fillStyle = 'red'; 
-    ctx.fill();
+    for (let stone of stones) {
+        const key = `${stone.r},${stone.c}`; // Create a unique key for each stone
+        if (!highlighted.has(key)) {
+            highlighted.add(key);
 
-    drawStone(stone.r, stone.c, board[stone.r][stone.c]); 
-  }
+            const x = stone.c * CELL_SIZE + CELL_SIZE / 2;
+            const y = stone.r * CELL_SIZE + CELL_SIZE / 2;
+            const radius = CELL_SIZE * 0.4;
+
+            // Draw a red outline to highlight (adjust color/thickness as needed)
+            ctx.beginPath();
+            ctx.arc(x, y, radius + 5, 0, 2 * Math.PI); // Increased radius for visibility
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 3; // Thicker outline
+            ctx.stroke();
+        }
+    }
 }
+
 
 function countInDirection(row, col, dr, dc) {
-  const player = board[row][col];
-  let count = 1; // Start with 1 for the placed stone
+    const player = board[row][col];
+    let count = 1; // Start with 1 for the placed stone
 
-  // Check in forward direction
-  let r = row + dr;
-  let c = col + dc;
-  while (inBounds(r, c) && board[r][c] === player) {
-    count++;
-    r += dr;
-    c += dc;
-  }
+    // Check in forward direction
+    let r = row + dr;
+    let c = col + dc;
+    while (inBounds(r, c) && board[r][c] === player) {
+        count++;
+        r += dr;
+        c += dc;
+    }
 
-  // Check in backward direction
-  r = row - dr;
-  c = col - dc;
-  while (inBounds(r, c) && board[r][c] === player) {
-    count++;
-    r -= dr;
-    c -= dc;
-  }
+    // Check in backward direction
+    r = row - dr;
+    c = col - dc;
+    while (inBounds(r, c) && board[r][c] === player) {
+        count++;
+        r -= dr;
+        c -= dc;
+    }
 
-  return count; 
-}
-
-function inBounds(r, c) { 
-  return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+    return count;
 }
 
 function inBounds(r, c) {
-  return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+    return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
 }
 
 function checkCaptures(row, col) {
-  const player = board[row][col];
-  const opponent = (player === 1) ? 2 : 1;
+    const player = board[row][col];
+    const opponent = (player === 1) ? 2 : 1;
 
-  const directions = [
-    { dr: 1, dc: 0 }, { dr: -1, dc: 0 },
-    { dr: 0, dc: 1 }, { dr: 0, dc: -1 },
-    { dr: 1, dc: 1 }, { dr: -1, dc: -1 },
-    { dr: 1, dc: -1 }, { dr: -1, dc: 1 }
-  ];
+    const directions = [
+        { dr: 1, dc: 0 }, { dr: -1, dc: 0 },
+        { dr: 0, dc: 1 }, { dr: 0, dc: -1 },
+        { dr: 1, dc: 1 }, { dr: -1, dc: -1 },
+        { dr: 1, dc: -1 }, { dr: -1, dc: 1 }
+    ];
 
-  for (let d of directions) {
-    let r1 = row + d.dr;
-    let c1 = col + d.dc;
-    let r2 = row + 2 * d.dr;
-    let c2 = col + 2 * d.dc;
-    let r3 = row + 3 * d.dr;
-    let c3 = col + 3 * d.dc;
+    for (let d of directions) {
+        let r1 = row + d.dr;
+        let c1 = col + d.dc;
+        let r2 = row + 2 * d.dr;
+        let c2 = col + 2 * d.dc;
+        let r3 = row + 3 * d.dr;
+        let c3 = col + 3 * d.dc;
 
-    if (inBounds(r1, c1) && inBounds(r2, c2) && inBounds(r3, c3)) {
-      if (board[r1][c1] === opponent && board[r2][c2] === opponent && board[r3][c3] === player) {
-        board[r1][c1] = 0;
-        board[r2][c2] = 0;
-        if (player === 1) blackCaptures++;
-        else whiteCaptures++;
-        drawBoard();
-      }
+        if (inBounds(r1, c1) && inBounds(r2, c2) && inBounds(r3, c3)) {
+            if (board[r1][c1] === opponent && board[r2][c2] === opponent && board[r3][c3] === player) {
+                board[r1][c1] = 0;
+                board[r2][c2] = 0;
+                if (player === 1) blackCaptures++;
+                else whiteCaptures++;
+                // The drawBoard() call was removed from here
+            }
+        }
     }
-  }
 }
 
 // Optional: For demonstration, a function to get a random empty cell (if no AI logic is present)
