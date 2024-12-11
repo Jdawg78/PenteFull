@@ -254,14 +254,21 @@ function updateStatus(won = false) {
 
   statusDiv.textContent = msg;
 }
+function getWinningStones(row, col, dr, dc, count) {
+  let winningStones = [];
+  for (let i = 0; i < count; i++) {
+    winningStones.push({ r: row + i * dr, c: col + i * dc });
+  }
+  return winningStones;
+}
 
 function checkWin(row, col) {
   // Check for capture-based win
   if (blackCaptures >= 5 || whiteCaptures >= 5) {
-    return true; 
+    return true;  
   }
 
-  // Check for 5 in a row (existing logic remains)
+  // Check for 5 in a row
   const directions = [
     { dr: 1, dc: 0 },
     { dr: 0, dc: 1 },
@@ -270,7 +277,10 @@ function checkWin(row, col) {
   ];
 
   for (let d of directions) {
-    if (countInDirection(row, col, d.dr, d.dc) >= 5) {
+    let count = countInDirection(row, col, d.dr, d.dc); 
+    if (count >= 5) {
+      const winningStones = getWinningStones(row, col, d.dr, d.dc, count);
+      highlightStones(winningStones); 
       return true; 
     }
   }
@@ -290,37 +300,38 @@ function highlightStones(stones) {
     ctx.fillStyle = 'red'; // Or any highlight color you like
     ctx.fill();
 
-    // Redraw the original stone on top
-    drawStone(stone.r, stone.c, currentPlayer); 
+    // Redraw the original stone on top 
+    drawStone(stone.r, stone.c, board[stone.r][stone.c]); // Get the correct player from the board
   }
 }
 function countInDirection(row, col, dr, dc) {
   const player = board[row][col];
-  let forwardCount = 0;
-  let backwardCount = 0;
+  let count = 1; // Start with 1 for the placed stone
 
-  // Forward direction
+  // Check in forward direction
   let r = row + dr;
   let c = col + dc;
   while (inBounds(r, c) && board[r][c] === player) {
-    forwardCount++;
+    count++;
     r += dr;
     c += dc;
   }
 
-  // Backward direction
+  // Check in backward direction
   r = row - dr;
   c = col - dc;
   while (inBounds(r, c) && board[r][c] === player) {
-    backwardCount++;
+    count++;
     r -= dr;
     c -= dc;
   }
 
-  const total = 1 + forwardCount + backwardCount; // 1 for the placed stone itself
-  return { total, forwardCount, backwardCount };
+  return count; 
 }
 
+function inBounds(r, c) { 
+  return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+}
 
 function inBounds(r, c) {
   return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
