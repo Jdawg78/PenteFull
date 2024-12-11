@@ -96,6 +96,7 @@ boardCanvas.addEventListener('click', (e) => {
     checkCaptures(row, col);
 
     if (checkWin(row, col)) {
+      drawBoard();
       gameOver = true;
       updateStatus(true);
     } else {
@@ -294,16 +295,15 @@ function highlightStones(stones) {
     const y = stone.r * CELL_SIZE + CELL_SIZE / 2;
     const radius = CELL_SIZE * 0.4;
 
-    // Draw a larger circle behind the stone with a highlight color
     ctx.beginPath();
-    ctx.arc(x, y, radius + 3, 0, 2 * Math.PI); // Slightly larger radius
-    ctx.fillStyle = 'red'; // Or any highlight color you like
+    ctx.arc(x, y, radius + 3, 0, 2 * Math.PI); 
+    ctx.fillStyle = 'red'; 
     ctx.fill();
 
-    // Redraw the original stone on top 
-    drawStone(stone.r, stone.c, board[stone.r][stone.c]); // Get the correct player from the board
+    drawStone(stone.r, stone.c, board[stone.r][stone.c]); 
   }
 }
+
 function countInDirection(row, col, dr, dc) {
   const player = board[row][col];
   let count = 1; // Start with 1 for the placed stone
